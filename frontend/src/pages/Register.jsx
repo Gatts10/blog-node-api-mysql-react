@@ -25,7 +25,7 @@ export default function Register() {
         inputs
       );
       navigate("/login");
-      console.log(res.data);
+      // console.log(res.data);
     } catch (err) {
       setError(err.response.data);
       console.log(err);
