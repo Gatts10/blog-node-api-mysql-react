@@ -1,19 +1,52 @@
 import React, { useState } from "react";
+import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
 export default function Write() {
-  const [value, setValue] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState(null);
+  const [category, setCategory] = useState("");
+
+  const upload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await axios.post(
+        `${import.meta.env.VITE_API}/upload`,
+        formData
+      );
+      // console.log(res.data);
+      return res.data;
+    } catch (err) {
+      console.log(res.err);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const imgUrl = upload();
+
+    try {
+    } catch (err) {
+      console.log(res.err);
+    }
+  };
 
   return (
     <div className="add">
       <div className="content">
-        <input type="text" placeholder="Title" />
+        <input
+          type="text"
+          placeholder="Title"
+          onChange={(e) => setTitle(e.target.value)}
+        />
         <div className="editorContainer">
           <ReactQuill
             theme="snow"
-            value={value}
-            onChange={setValue}
+            value={description}
+            onChange={setDescription}
             className="editor"
           />
         </div>
@@ -27,23 +60,40 @@ export default function Write() {
           <span>
             <b>Visibility: </b> Public
           </span>
-          <input type="file" id="file" className="upload" />
+          <input
+            type="file"
+            id="file"
+            className="upload"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
           <label htmlFor="file" className="file">
             Upload Image
           </label>
           <div className="buttons">
             <button>Save as draft</button>
-            <button>Update</button>
+            <button onClick={handleSubmit}>Publish</button>
           </div>
         </div>
         <div className="item">
           <h1>Category</h1>
           <div className="category">
-            <input type="radio" name="category" value="art" id="art" />
+            <input
+              type="radio"
+              name="category"
+              value="art"
+              id="art"
+              onChange={(e) => setCategory(e.target.value)}
+            />
             <label htmlFor="art">ART</label>
           </div>
           <div className="category">
-            <input type="radio" name="category" value="science" id="science" />
+            <input
+              type="radio"
+              name="category"
+              value="science"
+              id="science"
+              onChange={(e) => setCategory(e.target.value)}
+            />
             <label htmlFor="science">Science</label>
           </div>
           <div className="category">
@@ -52,19 +102,38 @@ export default function Write() {
               name="category"
               value="technology"
               id="technology"
+              onChange={(e) => setCategory(e.target.value)}
             />
             <label htmlFor="technology">Technology</label>
           </div>
           <div className="category">
-            <input type="radio" name="category" value="cinema" id="cinema" />
+            <input
+              type="radio"
+              name="category"
+              value="cinema"
+              id="cinema"
+              onChange={(e) => setCategory(e.target.value)}
+            />
             <label htmlFor="cinema">Cinema</label>
           </div>
           <div className="category">
-            <input type="radio" name="category" value="design" id="design" />
+            <input
+              type="radio"
+              name="category"
+              value="design"
+              id="design"
+              onChange={(e) => setCategory(e.target.value)}
+            />
             <label htmlFor="design">Design</label>
           </div>
           <div className="category">
-            <input type="radio" name="category" value="food" id="food" />
+            <input
+              type="radio"
+              name="category"
+              value="food"
+              id="food"
+              onChange={(e) => setCategory(e.target.value)}
+            />
             <label htmlFor="food">Food</label>
           </div>
         </div>
