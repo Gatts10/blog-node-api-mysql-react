@@ -24,7 +24,7 @@ export default function Menu({ category }) {
       <h1>Related Posts</h1>
       {posts.map((post) => (
         <div className="post" key={post.id}>
-          <img src={post.img} alt={`postImg-${post.id}`} />
+          <img src={`../upload/${post.img}`} alt={`postImg-${post.id}`} />
           <h2>{post.title}</h2>
           <button>Read More</button>
         </div>

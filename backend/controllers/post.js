@@ -14,7 +14,7 @@ export const getPosts = (req, res) => {
 
 export const getPost = (req, res) => {
   const q =
-    "SELECT `username`, `title`, `description`, post.img, user.img AS userImg, `date`, `category` FROM users user JOIN posts post ON user.id = post.user_id WHERE post.id = ?";
+    "SELECT post.id, `username`, `title`, `description`, post.img, user.img AS userImg, `date`, `category` FROM users user JOIN posts post ON user.id = post.user_id WHERE post.id = ?";
 
   //* params.id corresponde ao /:id das routes (posts.js)
   db.query(q, [req.params.id], (err, data) => {
@@ -24,11 +24,54 @@ export const getPost = (req, res) => {
 };
 
 export const addPost = (req, res) => {
-  res.json("From Controller!");
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const q =
+      "INSERT INTO posts(`title`, `description`, `img`, `category`, `date`, `user_id`) VALUES (?)";
+
+    const values = [
+      req.body.title,
+      req.body.description,
+      req.body.img,
+      req.body.category,
+      req.body.date,
+      userInfo.id,
+    ];
+
+    db.query(q, [values], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json("Post has been created!");
+    });
+  });
 };
 
 export const updatePost = (req, res) => {
-  res.json("From Controller!");
+  const token = req.cookies.access_token;
+  if (!token) return res.status(401).json("Not authenticated!");
+
+  jwt.verify(token, "jwtkey", (err, userInfo) => {
+    if (err) return res.status(403).json("Token is not valid!");
+
+    const postId = req.params.id;
+    const q =
+      "UPDATE posts SET `title`=?, `description`=?, `img`=?, `category`=? WHERE `id` = ? AND `user_id` = ?";
+
+    const values = [
+      req.body.title,
+      req.body.description,
+      req.body.img,
+      req.body.category,
+    ];
+
+    db.query(q, [...values, postId, userInfo.id], (err, data) => {
+      if (err) return res.status(500).json(err);
+      return res.json("Post has been updated!");
+    });
+  });
 };
 
 export const deletePost = (req, res) => {

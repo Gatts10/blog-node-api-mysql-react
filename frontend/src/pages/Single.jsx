@@ -6,6 +6,7 @@ import Delete from "../assets/delete.png";
 import axios from "axios";
 import moment from "moment";
 import { AuthContext } from "../context/authContext";
+import DOMPurify from "dompurify";
 
 export default function Single() {
   const [post, setPost] = useState({});
@@ -47,7 +48,7 @@ export default function Single() {
   return (
     <div className="single">
       <div className="content">
-        <img src={post?.img} alt="postImg" />
+        <img src={`../upload/${post.img}`} alt="postImg" />
         <div className="user">
           {post.userImg && <img src={post.userImg} alt="imgUser" />}
           <div className="info">
@@ -56,7 +57,7 @@ export default function Single() {
           </div>
           {currentUser.username === post.username && (
             <div className="edit">
-              <Link to={`/write?edit=1`}>
+              <Link to={`/write?edit=${postsId}`} state={post}>
                 <img src={Edit} alt="imgEdit" />
               </Link>
               <img src={Delete} alt="imgDelete" onClick={handleDelete} />
@@ -64,7 +65,11 @@ export default function Single() {
           )}
         </div>
         <h1>{post.title}</h1>
-        {post.description}
+        <p
+          dangerouslySetInnerHTML={{
+            __html: DOMPurify.sanitize(post.description),
+          }}
+        ></p>
       </div>
       <Menu category={post.category} />
     </div>

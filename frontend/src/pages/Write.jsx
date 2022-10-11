@@ -1,13 +1,17 @@
 import React, { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import moment from "moment";
 
 export default function Write() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const state = useLocation().state;
+
+  const [title, setTitle] = useState(state?.title || "");
+  const [description, setDescription] = useState(state?.description || "");
   const [file, setFile] = useState(null);
-  const [category, setCategory] = useState("");
+  const [category, setCategory] = useState(state?.category || "");
 
   const upload = async () => {
     try {
@@ -24,11 +28,42 @@ export default function Write() {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const imgUrl = upload();
+    const imgUrl = await upload();
 
     try {
+      state
+        ? await axios.patch(
+            `${import.meta.env.VITE_API}/posts/${state.id}`,
+            {
+              title,
+              description,
+              category,
+              img: file ? imgUrl : "",
+            },
+            {
+              withCredentials: true,
+              credentials: "include",
+            }
+          )
+        : await axios.post(
+            `${import.meta.env.VITE_API}/posts`,
+            {
+              title,
+              description,
+              category,
+              img: file ? imgUrl : "",
+              date: moment(Date.now()).format("YYYY-MM-DD HH:mm:ss"),
+            },
+            {
+              withCredentials: true,
+              credentials: "include",
+            }
+          );
+          navigate("/");
     } catch (err) {
       console.log(res.err);
     }
@@ -39,6 +74,7 @@ export default function Write() {
       <div className="content">
         <input
           type="text"
+          value={title}
           placeholder="Title"
           onChange={(e) => setTitle(e.target.value)}
         />
@@ -81,6 +117,7 @@ export default function Write() {
               type="radio"
               name="category"
               value="art"
+              checked={category === "art"}
               id="art"
               onChange={(e) => setCategory(e.target.value)}
             />
@@ -91,6 +128,7 @@ export default function Write() {
               type="radio"
               name="category"
               value="science"
+              checked={category === "science"}
               id="science"
               onChange={(e) => setCategory(e.target.value)}
             />
@@ -101,6 +139,7 @@ export default function Write() {
               type="radio"
               name="category"
               value="technology"
+              checked={category === "technology"}
               id="technology"
               onChange={(e) => setCategory(e.target.value)}
             />
@@ -111,6 +150,7 @@ export default function Write() {
               type="radio"
               name="category"
               value="cinema"
+              checked={category === "cinema"}
               id="cinema"
               onChange={(e) => setCategory(e.target.value)}
             />
@@ -121,6 +161,7 @@ export default function Write() {
               type="radio"
               name="category"
               value="design"
+              checked={category === "design"}
               id="design"
               onChange={(e) => setCategory(e.target.value)}
             />
@@ -131,6 +172,7 @@ export default function Write() {
               type="radio"
               name="category"
               value="food"
+              checked={category === "food"}
               id="food"
               onChange={(e) => setCategory(e.target.value)}
             />
